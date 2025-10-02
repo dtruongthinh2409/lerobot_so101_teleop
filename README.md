@@ -17,7 +17,7 @@ Sample Environment for the LeRobot SO-101 Robot in Isaac Lab to collect demonstr
 ## Installation
 
 - Install Isaac Lab by following the [installation guide](https://isaac-sim.github.io/IsaacLab/main/source/setup/installation/index.html).
- Use Conda to stay with the Lerobot installation guide.
+ Use Conda to be synced with the Lerobot installation guide.
 
 - In your isaac lab conda environment, Install Lerobot
     ```
