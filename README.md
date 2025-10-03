@@ -67,7 +67,6 @@ Sample Environment for the LeRobot SO-101 Robot in Isaac Lab to collect demonstr
 ## What's Next
 
 - Add simple method to record the episodes
-- Add randomization for physics materials properties in the scene
 - Add randomization for visual materials properties in the scene
 
 ## Limitations

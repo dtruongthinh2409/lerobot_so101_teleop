@@ -29,6 +29,7 @@ def randomize_static_asset_orientation(
 
     with Sdf.ChangeBlock():
         asset_xform.set_local_poses(orientations=orientations)
+        print(f"[INFO]: Randomized static asset orientation: {asset_cfg.name}")
 
 
 def randomize_light_exposure(

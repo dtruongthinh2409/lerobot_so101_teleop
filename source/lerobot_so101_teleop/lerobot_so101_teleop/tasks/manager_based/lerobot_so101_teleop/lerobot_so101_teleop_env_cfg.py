@@ -48,7 +48,7 @@ class LerobotSo101TeleopSceneCfg(InteractiveSceneCfg):
         ),
     )
 
-    pad = AssetBaseCfg(
+    robot_pad = AssetBaseCfg(
         prim_path="{ENV_REGEX_NS}/Environment/table/Static/Cube_002"
     )
 
@@ -186,12 +186,12 @@ class EventCfg:
         },
     )
 
-    reset_pad_orientation = EventTerm(
+    reset_robot_pad_orientation = EventTerm(
         func=mdp.randomize_static_asset_orientation,
         mode="reset",
         params={
             "pose_range": {"yaw": (math.pi-0.2, math.pi+0.2)},
-            "asset_cfg": SceneEntityCfg("pad"),
+            "asset_cfg": SceneEntityCfg("robot_pad"),
         },
     )
 
@@ -262,7 +262,8 @@ class LerobotSo101TeleopEnvCfg(ManagerBasedRLEnvCfg):
 
         self.scene.num_envs = 1  # Always 1 env for teleoperation
         # viewer settings
-        self.viewer.eye = (0.6, 0.6, 0.3)
+        self.viewer.eye = (-0.25, -0.4, 0.22)
+        self.viewer.lookat = (0.15, 0.0, 0.12)
         # simulation settings
         self.sim.dt = 1 / 120
         self.sim.render_interval = self.decimation
