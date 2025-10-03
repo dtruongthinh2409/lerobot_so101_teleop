@@ -4,14 +4,9 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 import math
-import torch
-
-from pxr import Gf, Sdf
 
 import isaaclab.sim as sim_utils
-import isaaclab.utils.math as math_utils
 
-from isaaclab.sim import get_current_stage
 from isaaclab.assets import ArticulationCfg, AssetBaseCfg, RigidObjectCfg
 from isaaclab.envs import ManagerBasedRLEnvCfg
 from isaaclab.managers import EventTermCfg as EventTerm
@@ -48,53 +43,19 @@ class LerobotSo101TeleopSceneCfg(InteractiveSceneCfg):
     base_plate = RigidObjectCfg(
         prim_path="{ENV_REGEX_NS}/Environment/rock_a_stack/Base",
         init_state=RigidObjectCfg.InitialStateCfg(
-            pos=(0.2630187963533502, -0.07503431658766903, 0.04273062786311794),
+            pos=(0.263018, -0.0750343, 0.0427306),
             rot=(0.98098075, 0.0, 0.0, 0.19410504),
         ),
     )
 
-    ring_01 = RigidObjectCfg(
-        prim_path="{ENV_REGEX_NS}/Environment/rock_a_stack/Ring01",
-        init_state=RigidObjectCfg.InitialStateCfg(
-            pos=(0.27783690762421165, 0.08424602121311484, 0.12378733765868938),
-            rot=(1.0, 0.0, 0.0, 0.0),
-        ),
-    )
-
-    ring_02 = RigidObjectCfg(
-        prim_path="{ENV_REGEX_NS}/Environment/rock_a_stack/Ring02",
-        init_state=RigidObjectCfg.InitialStateCfg(
-            pos=(0.27129651520577125, 0.016693925458027874, 0.09686271112669181),
-            rot=(1.0, 0.0, 0.0, 0.0),
-        ),
-    )
-
-    ring_03 = RigidObjectCfg(
-        prim_path="{ENV_REGEX_NS}/Environment/rock_a_stack/Ring03",
-        init_state=RigidObjectCfg.InitialStateCfg(
-            pos=(0.2565863897049621, 0.12367459118708185, 0.09971861729194248),
-            rot=(1.0, 0.0, 0.0, 0.0),
-        ),
-    )
-
-    ring_04 = RigidObjectCfg(
-        prim_path="{ENV_REGEX_NS}/Environment/rock_a_stack/Ring04",
-        init_state=RigidObjectCfg.InitialStateCfg(
-            pos=(0.2973915909379369, 0.10406110833155013, 0.06506421666657526),
-            rot=(1.0, 0.0, 0.0, 0.0),
-        ),
-    )
-
-    ring_05 = RigidObjectCfg(
-        prim_path="{ENV_REGEX_NS}/Environment/rock_a_stack/Ring05",
-        init_state=RigidObjectCfg.InitialStateCfg(
-            pos=(0.19686964137123242, 0.12395675122242616, 0.06984264096164769),
-            rot=(1.0, 0.0, 0.0, 0.0),
-        ),
+    pad = AssetBaseCfg(
+        prim_path="{ENV_REGEX_NS}/Environment/table/Static/Cube_002"
     )
 
     # Lights
-    rect_01 = AssetBaseCfg(prim_path="{ENV_REGEX_NS}/Environment/room/lights/RectLight")
+    rect_01 = AssetBaseCfg(
+        prim_path="{ENV_REGEX_NS}/Environment/room/lights/RectLight"
+    )
     rect_02 = AssetBaseCfg(
         prim_path="{ENV_REGEX_NS}/Environment/room/lights/RectLight_01"
     )
@@ -102,33 +63,28 @@ class LerobotSo101TeleopSceneCfg(InteractiveSceneCfg):
     # robot
     robot: ArticulationCfg = SO101_CFG.replace(prim_path="{ENV_REGEX_NS}/Robot")
 
+    def __post_init__(self) -> None:
+        rings = [
+            ("Ring01", (0.2778369, 0.0842460, 0.1237873)),
+            ("Ring02", (0.2712965, 0.01669392, 0.0968627)),
+            ("Ring03", (0.256586, 0.1236745, 0.0997186)),
+            ("Ring04", (0.297391, 0.1040611, 0.0650642)),
+            ("Ring05", (0.1968696, 0.1239567, 0.0698426)),
+        ]
+        for ring in rings:
+            ring_cfg = RigidObjectCfg(
+                prim_path="{ENV_REGEX_NS}/Environment/rock_a_stack/" + ring[0],
+                init_state=RigidObjectCfg.InitialStateCfg(
+                    pos=ring[1],
+                    rot=(1.0, 0.0, 0.0, 0.0),
+                ),
+            )
+            setattr(self, ring[0], ring_cfg)
+
 
 ##
 # MDP settings
 ##
-
-
-def randomize_light_exposure(
-    env,
-    env_ids: torch.Tensor | None,
-    exposure_range: tuple[float, float],
-    asset_cfg: SceneEntityCfg = None,
-):
-
-    stage = get_current_stage()
-    asset = env.scene[asset_cfg.name]
-    asset_prim_path = asset.prim_paths[0]
-
-    exposure = math_utils.sample_uniform(*exposure_range, (1,), device="cpu").item()
-
-    with Sdf.ChangeBlock():
-        prim = stage.GetPrimAtPath(asset_prim_path)
-        if prim.IsValid():
-            prim.GetAttribute("inputs:exposure").Set(exposure)
-            print(
-                f"[INFO]: Exposure set on light prim {asset_cfg.name} to {exposure:.2f}"
-            )
-
 
 @configclass
 class ActionsCfg:
@@ -189,7 +145,7 @@ class EventCfg:
 
     # Randomize light exposure
     reset_light_01_exposure = EventTerm(
-        func=randomize_light_exposure,
+        func=mdp.randomize_light_exposure,
         mode="reset",
         params={
             "exposure_range": (-3.0, 1.0),
@@ -198,12 +154,18 @@ class EventCfg:
     )
 
     reset_light_02_exposure = EventTerm(
-        func=randomize_light_exposure,
+        func=mdp.randomize_light_exposure,
         mode="reset",
         params={
             "exposure_range": (-3.0, 1.0),
             "asset_cfg": SceneEntityCfg("rect_02"),
         },
+    )
+
+    reset_physics_material_props = EventTerm(
+        func=mdp.randomize_physics_material,
+        mode="reset",
+        params={},
     )
 
     # Reset physics objects to their initial positions
@@ -223,78 +185,56 @@ class EventCfg:
             "asset_cfg": SceneEntityCfg("base_plate"),
         },
     )
-    reset_ring_01 = EventTerm(
-        func=mdp.reset_root_state_uniform,
+
+    reset_pad_orientation = EventTerm(
+        func=mdp.randomize_static_asset_orientation,
         mode="reset",
         params={
-            "pose_range": {"x": (-0.05, 0.05), "y": (-0.05, 0.05), "z": (0, 0)},
-            "velocity_range": {},
-            "asset_cfg": SceneEntityCfg("ring_01"),
+            "pose_range": {"yaw": (math.pi-0.2, math.pi+0.2)},
+            "asset_cfg": SceneEntityCfg("pad"),
         },
     )
-    reset_ring_02 = EventTerm(
-        func=mdp.reset_root_state_uniform,
-        mode="reset",
-        params={
-            "pose_range": {"x": (-0.05, 0.05), "y": (-0.05, 0.05), "z": (0, 0)},
-            "velocity_range": {},
-            "asset_cfg": SceneEntityCfg("ring_02"),
-        },
-    )
-    reset_ring_03 = EventTerm(
-        func=mdp.reset_root_state_uniform,
-        mode="reset",
-        params={
-            "pose_range": {"x": (-0.05, 0.05), "y": (-0.05, 0.05), "z": (0, 0)},
-            "velocity_range": {},
-            "asset_cfg": SceneEntityCfg("ring_03"),
-        },
-    )
-    reset_ring_04 = EventTerm(
-        func=mdp.reset_root_state_uniform,
-        mode="reset",
-        params={
-            "pose_range": {"x": (-0.05, 0.05), "y": (-0.05, 0.05), "z": (0, 0)},
-            "velocity_range": {},
-            "asset_cfg": SceneEntityCfg("ring_04"),
-        },
-    )
-    reset_ring_05 = EventTerm(
-        func=mdp.reset_root_state_uniform,
-        mode="reset",
-        params={
-            "pose_range": {"x": (-0.05, 0.05), "y": (-0.05, 0.05), "z": (0, 0)},
-            "velocity_range": {},
-            "asset_cfg": SceneEntityCfg("ring_05"),
-        },
-    )
+
+    def __post_init__(self) -> None:
+        # Handle rings transform and physics material
+        for ring in ["Ring01", "Ring02", "Ring03", "Ring04", "Ring05"]:
+          
+            reset_ring_transform = EventTerm(
+                func=mdp.reset_root_state_uniform,
+                mode="reset",
+                params={
+                    "pose_range": {"x": (-0.05, 0.05), "y": (-0.05, 0.05), "z": (0, 0)},
+                    "velocity_range": {},
+                    "asset_cfg": SceneEntityCfg(ring),
+                },
+            )
+            setattr(self, f"reset_{ring}_transform", reset_ring_transform)
+     
+            reset_ring_physics_material = EventTerm(
+                func=mdp.apply_physics_material,
+                mode="reset",
+                params={
+                    "asset_cfg": SceneEntityCfg(ring),
+                },
+            )
+            setattr(self, f"reset_{ring}_phyiscs_material", reset_ring_physics_material)
 
 
 @configclass
 class RewardsCfg:
     """Reward terms for the MDP."""
-
     pass
-
-    # # (1) Constant running reward
-    # alive = RewTerm(func=mdp.is_alive, weight=1.0)
-    # # (2) Failure penalty
-    # terminating = RewTerm(func=mdp.is_terminated, weight=-2.0)
 
 
 @configclass
 class TerminationsCfg:
     """Termination terms for the MDP."""
-
-    # (1) Time out
-    # time_out = DoneTerm(func=mdp.time_out, time_out=True)
     pass
 
 
 ##
 # Environment configuration
 ##
-
 
 @configclass
 class LerobotSo101TeleopEnvCfg(ManagerBasedRLEnvCfg):
@@ -311,6 +251,8 @@ class LerobotSo101TeleopEnvCfg(ManagerBasedRLEnvCfg):
     rewards = None  # No rewards for teleoperation
     terminations = None  # No terminations for teleoperation
 
+
+
     # Post initialization
     def __post_init__(self) -> None:
         """Post initialization."""
@@ -324,3 +266,15 @@ class LerobotSo101TeleopEnvCfg(ManagerBasedRLEnvCfg):
         # simulation settings
         self.sim.dt = 1 / 120
         self.sim.render_interval = self.decimation
+
+        self.sim.render.rendering_mode = "quality"
+        self.sim.render.enable_translucency = False
+
+        # create physics material
+        physics_material_cfg = sim_utils.RigidBodyMaterialCfg(
+            static_friction=0.5,
+            dynamic_friction=0.5,
+            restitution=0.5,
+        )
+        self.physics_material_path = "/Looks/physicsMaterial"
+        physics_material_cfg.func(self.physics_material_path, physics_material_cfg)
