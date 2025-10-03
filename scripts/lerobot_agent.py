@@ -77,8 +77,8 @@ def main():
     actions = torch.zeros(env.action_space.shape, device=env.unwrapped.device)
 
     # disable translucency
-    carb_settings = carb.settings.get_settings()
-    carb_settings.set("/rtx/translucency/enabled", False)
+    # carb_settings = carb.settings.get_settings()
+    # carb_settings.set("/rtx/translucency/enabled", False)
 
     # simulate environment
     while simulation_app.is_running():
