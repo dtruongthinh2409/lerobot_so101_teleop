@@ -48,13 +48,13 @@ Sample Environment for the LeRobot SO-101 Robot in Isaac Lab to collect demonstr
     ```bash
     python scripts/list_envs.py
     ```
-    You should see a single environment called `Template-Lerobot-So101-Teleop-v0`
+    You should see a single environment called `Lerobot-So101-Teleop-v0`
 - Edit `scripts/lerobot_agent.py` by changing `lerobot_cfg` to match your port and id of your setup. (You have this information from the calibration step)
 
 - Run the environment
 
     ```bash
-    python scripts/lerobot_agent.py --task Template-Lerobot-So101-Teleop-v0 --rendering_mode quality
+    python scripts/lerobot_agent.py --task Lerobot-So101-Teleop-v0
     ```
 
 ## Contributors

@@ -12,7 +12,7 @@ from . import agents
 
 
 gym.register(
-    id="Template-Lerobot-So101-Teleop-v0",
+    id="Lerobot-So101-Teleop-v0",
     entry_point="isaaclab.envs:ManagerBasedRLEnv",
     disable_env_checker=True,
     kwargs={
