@@ -26,7 +26,7 @@ Sample Environment for the LeRobot SO-101 Robot in Isaac Lab to collect demonstr
 
 - In your isaac lab conda environment, Install Lerobot
     ```
-    pip install 'lerobot[feetech]'
+    pip install 'lerobot[feetech]==0.3.3'
     ```
 - Make sure your Lerobot _Leader_ arm has been [calibrated](https://huggingface.co/docs/lerobot/en/so101#calibrate).
 
