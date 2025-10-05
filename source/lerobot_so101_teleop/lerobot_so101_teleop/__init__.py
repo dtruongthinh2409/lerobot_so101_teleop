@@ -11,6 +11,7 @@ Python module serving as a project/extension template.
 from .tasks import *
 from .keyboard import *
 from .lerobot_interface import *
+from .lerobot_recorder import *
 
 
 

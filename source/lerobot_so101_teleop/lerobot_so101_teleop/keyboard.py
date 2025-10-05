@@ -1,10 +1,16 @@
 import carb
 import omni.appwindow
+import omni.kit.app
 
+from carb.eventdispatcher import get_eventdispatcher, Event
 
 class KeyboardControl:
+
+    STOP_RECORDING_EVENT: str = "lerobot_so101_teleop.stop_recording"
+    
     def __init__(self):
         self.reset_world = False
+        self.recording = False
 
         # Get the window to register keyboard callbacks
         self._window = omni.appwindow.get_default_app_window()
@@ -22,7 +28,18 @@ class KeyboardControl:
         if event.type == carb.input.KeyboardEventType.KEY_PRESS:
             if event.input.name == "R":
                 self.reset_world = True
+                self.stop_recording()
                 print(f"[INFO]: Reset world...")
+                return True
+
+            if event.input.name == "S":
+                if self.recording:
+                    self.stop_recording()
+                    return True
+
+                
+                self.recording = True
+                print(f"[INFO]: Started recording!")
                 return True
 
         return False
@@ -34,3 +51,19 @@ class KeyboardControl:
                 self._keyboard, self._sub_keyboard
             )
             self._sub_keyboard = None
+
+    # This should not live in this class, but it works for now
+    def stop_recording(self):
+        if self.recording:
+            print(f"[INFO]: Stopped recording.")
+            self.recording = False
+
+            omni.kit.app.queue_event(
+                self.STOP_RECORDING_EVENT, 
+                payload={}
+                )
+
+            # if hasattr(self, "recorder"):
+                # self.recorder.save_episode()
+                
+              

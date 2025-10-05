@@ -4,10 +4,12 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 import math
+from pty import spawn
 
 import isaaclab.sim as sim_utils
 
 from isaaclab.assets import ArticulationCfg, AssetBaseCfg, RigidObjectCfg
+from isaaclab.sensors import CameraCfg
 from isaaclab.envs import ManagerBasedRLEnvCfg
 from isaaclab.managers import EventTermCfg as EventTerm
 from isaaclab.managers import ObservationGroupCfg as ObsGroup
@@ -63,6 +65,19 @@ class LerobotSo101TeleopSceneCfg(InteractiveSceneCfg):
     # robot
     robot: ArticulationCfg = SO101_CFG.replace(prim_path="{ENV_REGEX_NS}/Robot")
 
+
+    # Camera
+    gripper_cam = CameraCfg(
+        prim_path="{ENV_REGEX_NS}/Robot/gripper/Camera",
+        update_period=0.0,
+        height=512,
+        width=512,
+        data_types=["rgb"],
+        spawn = None
+        # spawn=sim_utils.PinholeCameraCfg(focal_length=18.15, clipping_range=(0.1, 2)),
+        # offset=CameraCfg.OffsetCfg(pos=(0.0, 0.12, 1.85418), rot=(-0.17246, 0.98502, 0.0, 0.0), convention="ros"),
+    )
+
     def __post_init__(self) -> None:
         rings = [
             ("Ring01", (0.2778369, 0.0842460, 0.1237873)),
@@ -108,11 +123,11 @@ class ObservationsCfg:
 
         # observation terms (order preserved)
         joint_pos_rel = ObsTerm(func=mdp.joint_pos_rel)
-        joint_vel_rel = ObsTerm(func=mdp.joint_vel_rel)
+        # joint_vel_rel = ObsTerm(func=mdp.joint_vel_rel)
 
         def __post_init__(self) -> None:
             self.enable_corruption = False
-            self.concatenate_terms = True
+            # self.concatenate_terms = True
 
     # observation groups
     policy: PolicyCfg = PolicyCfg()
@@ -266,7 +281,7 @@ class LerobotSo101TeleopEnvCfg(ManagerBasedRLEnvCfg):
         self.viewer.lookat = (0.15, 0.0, 0.12)
         # simulation settings
         self.sim.dt = 1 / 120
-        self.sim.render_interval = self.decimation
+        self.sim.render_interval = self.decimation # render every 2 frames to the viewport
 
         self.sim.render.rendering_mode = "quality"
         self.sim.render.enable_translucency = False

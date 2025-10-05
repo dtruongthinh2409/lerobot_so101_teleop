@@ -62,3 +62,14 @@ class LeRobotSO101Interface:
 
         # Convert to radians
         return mapped_deg * torch.pi / 180
+
+
+if __name__ == "__main__":
+    lerobot_cfg = {"port": "/dev/ttyACM0", "id": "leader_arm_1"}
+    lerobot_interface = LeRobotSO101Interface(cfg=lerobot_cfg)
+    while True:
+        real_action = lerobot_interface.teleop_dev.get_action()
+        print(type(real_action))
+        print(real_action)
+        print(list(real_action.keys()))
+        

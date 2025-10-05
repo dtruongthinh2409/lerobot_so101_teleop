@@ -56,18 +56,38 @@ Sample Environment for the LeRobot SO-101 Robot in Isaac Lab to collect demonstr
     ```bash
     python scripts/lerobot_agent.py --task Lerobot-So101-Teleop-v0
     ```
+- Get familiar with the teleop feeling
+
+## Record a dataset
+
+_Currently only local recording without pushing to HuggingFace hub_
+
+- Run the environment and include dataset repo-id and repo-root (They will get created if not already exists)
+
+    ```bash
+    python scripts/lerobot_agent.py --task Lerobot-So101-Teleop-v0 \
+    --repo_id lerobot_so101_teleop \
+    --repo_root $(pwd)/datasets/lerobot_so101_teleop \
+    --task_name "Pick up the blue ring and put it on the pole"
+    ```
+- Click `S` to start/stop the recording. Reset the environment `R` will also stop the recording
+
+- After each episode there will be a short processing time, during that the simulator will be paused and a progress bar will show in the console.
+
+- When done, exit the simulation with `Ctrl+C`
+
+- To playback dataset episodes, use lerobot rerun visualizer
+    ```bash
+    python -m lerobot.scripts.visualize_dataset \
+    --repo-id lerobot_so101_teleop \
+    --root $(pwd)/datasets/lerobot_so101_teleop --episode-index 0
+    ```
 
 ## Contributors
 
 - Thank you [LycheeAI](https://lycheeai-hub.com/) for making the SO101 arm available in USD format  💚 [https://github.com/MuammerBay/so-arm101-ros2-bridge/tree/main/IsaacSim_USD](https://github.com/MuammerBay/so-arm101-ros2-bridge/tree/main/IsaacSim_USD)
 
 - Contributions are welcome via pull requests
-
-
-## What's Next
-
-- Add simple method to record the episodes
-- Add randomization for visual materials properties in the scene
 
 ## Limitations
 
