@@ -102,6 +102,8 @@ def main():
         dataset_root=args_cli.repo_root,
         fps=30,
         device=env.unwrapped.device,
+        rgb_height=env.scene.cfg.gripper_cam.height,
+        rgb_width=env.scene.cfg.gripper_cam.width,
     )
     recorder.init_dataset() 
 

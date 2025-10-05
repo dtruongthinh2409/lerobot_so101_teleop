@@ -15,53 +15,66 @@ class LeRobotRecorder:
 
     STOP_RECORDING_EVENT: str = "lerobot_so101_teleop.stop_recording"
 
-    FOLLOWER_OBS_FEATURES = {
-        "observation.state": {
-            "dtype": "float32",
-            "shape": (6,),
-            "names": [
-                "shoulder_pan.pos",
-                "shoulder_lift.pos",
-                "elbow_flex.pos",
-                "wrist_flex.pos",
-                "wrist_roll.pos",
-                "gripper.pos",
-            ],
-        },
-        "observation.camera.gripper": {
-            "dtype": "image",
-            "shape": (512, 512, 3),
-            "names": ["height", "width", "channels"],
-        },
-    }
-
-    LEADER_ACTION_FEATURES = {
-        "action": {
-            "dtype": "float32",
-            "shape": (6,),
-            "names": [
-                "shoulder_pan.pos",
-                "shoulder_lift.pos",
-                "elbow_flex.pos",
-                "wrist_flex.pos",
-                "wrist_roll.pos",
-                "gripper.pos",
-            ],
-        }
-    }
-
-    SO101_ACTION_NAMES = [
-        "shoulder_pan.pos",
-        "shoulder_lift.pos",
-        "elbow_flex.pos",
-        "wrist_flex.pos",
-        "wrist_roll.pos",
-        "gripper.pos",
-    ]
-
     def __init__(
-        self, task_name: str, repo_id: str, dataset_root: str, fps: int, device: str
+        self, 
+        task_name: str, 
+        repo_id: str, 
+        dataset_root: str, 
+        fps: int, 
+        device: str,
+        rgb_height: int,
+        rgb_width: int,
     ):
+
+        self.fps = fps
+        self.dt = 1 / self.fps
+        self.rgb_height = rgb_height
+        self.rgb_width = rgb_width
+
+        self.FOLLOWER_OBS_FEATURES = {
+            "observation.state": {
+                "dtype": "float32",
+                "shape": (6,),
+                "names": [
+                    "shoulder_pan.pos",
+                    "shoulder_lift.pos",
+                    "elbow_flex.pos",
+                    "wrist_flex.pos",
+                    "wrist_roll.pos",
+                    "gripper.pos",
+                ],
+            },
+            "observation.camera.gripper": {
+                "dtype": "image",
+                "shape": (self.rgb_height, self.rgb_width, 3),
+                "names": ["height", "width", "channels"],
+            },
+        }
+
+        self.LEADER_ACTION_FEATURES = {
+            "action": {
+                "dtype": "float32",
+                "shape": (6,),
+                "names": [
+                    "shoulder_pan.pos",
+                    "shoulder_lift.pos",
+                    "elbow_flex.pos",
+                    "wrist_flex.pos",
+                    "wrist_roll.pos",
+                    "gripper.pos",
+                ],
+            }
+        }
+
+        self.SO101_ACTION_NAMES = [
+            "shoulder_pan.pos",
+            "shoulder_lift.pos",
+            "elbow_flex.pos",
+            "wrist_flex.pos",
+            "wrist_roll.pos",
+            "gripper.pos",
+        ]
+
         self.repo_id = repo_id
         self.dataset_root = dataset_root
         self.task_name = task_name
@@ -69,8 +82,7 @@ class LeRobotRecorder:
             **self.FOLLOWER_OBS_FEATURES,
             **self.LEADER_ACTION_FEATURES,
         }
-        self.fps = fps
-        self.dt = 1 / self.fps
+
 
         self.device = device
         self.capcity = 3 * 60 * self.fps
@@ -122,7 +134,7 @@ class LeRobotRecorder:
             (self.capcity, 6), dtype=torch.float32, device=self.device
         )
         self.rgb_buffer_tensor = torch.zeros(
-            (self.capcity, 512, 512, 3), dtype=torch.uint8, device=self.device
+            (self.capcity, self.rgb_height, self.rgb_width, 3), dtype=torch.uint8, device=self.device
         )
 
     def push_frame_to_buffer(self, action, observation, rgb):

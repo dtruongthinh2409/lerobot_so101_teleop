@@ -55,9 +55,7 @@ class LerobotSo101TeleopSceneCfg(InteractiveSceneCfg):
     )
 
     # Lights
-    rect_01 = AssetBaseCfg(
-        prim_path="{ENV_REGEX_NS}/Environment/room/lights/RectLight"
-    )
+    rect_01 = AssetBaseCfg(prim_path="{ENV_REGEX_NS}/Environment/room/lights/RectLight")
     rect_02 = AssetBaseCfg(
         prim_path="{ENV_REGEX_NS}/Environment/room/lights/RectLight_01"
     )
@@ -65,17 +63,31 @@ class LerobotSo101TeleopSceneCfg(InteractiveSceneCfg):
     # robot
     robot: ArticulationCfg = SO101_CFG.replace(prim_path="{ENV_REGEX_NS}/Robot")
 
-
     # Camera
     gripper_cam = CameraCfg(
-        prim_path="{ENV_REGEX_NS}/Robot/gripper/Camera",
+        prim_path="{ENV_REGEX_NS}/Robot/gripper/gripper_cam",
         update_period=0.0,
-        height=512,
-        width=512,
+        height=480,
+        width=640,
         data_types=["rgb"],
-        spawn = None
-        # spawn=sim_utils.PinholeCameraCfg(focal_length=18.15, clipping_range=(0.1, 2)),
-        # offset=CameraCfg.OffsetCfg(pos=(0.0, 0.12, 1.85418), rot=(-0.17246, 0.98502, 0.0, 0.0), convention="ros"),
+        # Creating a fisheye camera with the following parameters, not using the camera from the USD file
+        spawn=sim_utils.FisheyeCameraCfg(
+            projection_type="fisheyeKannalaBrandtK3",
+            fisheye_nominal_height=480,
+            fisheye_nominal_width=640,
+            fisheye_optical_centre_x=320,
+            fisheye_optical_centre_y=240,
+            fisheye_max_fov=170,
+            fisheye_polynomial_a=0,
+            fisheye_polynomial_b=0.0028,
+            fisheye_polynomial_c=0,
+            fisheye_polynomial_d=0,
+            fisheye_polynomial_e=0,
+            fisheye_polynomial_f=0,
+        ),
+        offset=CameraCfg.OffsetCfg(
+            pos=(0.0, 0.1, 0.015), rot=(0.2588, 0.9659, 0.0, 0.0), convention="ros"
+        ),
     )
 
     def __post_init__(self) -> None:
@@ -100,6 +112,7 @@ class LerobotSo101TeleopSceneCfg(InteractiveSceneCfg):
 ##
 # MDP settings
 ##
+
 
 @configclass
 class ActionsCfg:
@@ -205,7 +218,7 @@ class EventCfg:
         func=mdp.randomize_static_asset_orientation,
         mode="reset",
         params={
-            "pose_range": {"yaw": (math.pi-0.2, math.pi+0.2)},
+            "pose_range": {"yaw": (math.pi - 0.2, math.pi + 0.2)},
             "asset_cfg": SceneEntityCfg("robot_pad"),
         },
     )
@@ -213,7 +226,7 @@ class EventCfg:
     def __post_init__(self) -> None:
         # Handle rings transform and physics material
         for ring in ["Ring01", "Ring02", "Ring03", "Ring04", "Ring05"]:
-          
+
             reset_ring_transform = EventTerm(
                 func=mdp.reset_root_state_uniform,
                 mode="reset",
@@ -224,7 +237,7 @@ class EventCfg:
                 },
             )
             setattr(self, f"reset_{ring}_transform", reset_ring_transform)
-     
+
             reset_ring_physics_material = EventTerm(
                 func=mdp.apply_physics_material,
                 mode="reset",
@@ -238,18 +251,21 @@ class EventCfg:
 @configclass
 class RewardsCfg:
     """Reward terms for the MDP."""
+
     pass
 
 
 @configclass
 class TerminationsCfg:
     """Termination terms for the MDP."""
+
     pass
 
 
 ##
 # Environment configuration
 ##
+
 
 @configclass
 class LerobotSo101TeleopEnvCfg(ManagerBasedRLEnvCfg):
@@ -266,8 +282,6 @@ class LerobotSo101TeleopEnvCfg(ManagerBasedRLEnvCfg):
     rewards = None  # No rewards for teleoperation
     terminations = None  # No terminations for teleoperation
 
-
-
     # Post initialization
     def __post_init__(self) -> None:
         """Post initialization."""
@@ -281,7 +295,9 @@ class LerobotSo101TeleopEnvCfg(ManagerBasedRLEnvCfg):
         self.viewer.lookat = (0.15, 0.0, 0.12)
         # simulation settings
         self.sim.dt = 1 / 120
-        self.sim.render_interval = self.decimation # render every 2 frames to the viewport
+        self.sim.render_interval = (
+            self.decimation
+        )  # render every 2 frames to the viewport
 
         self.sim.render.rendering_mode = "quality"
         self.sim.render.enable_translucency = False
