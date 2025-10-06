@@ -64,8 +64,6 @@ Sample Environment for the LeRobot SO-101 Robot in Isaac Lab to collect demonstr
 
 ## Record a dataset
 
-_Currently only local recording without pushing to HuggingFace hub_
-
 - Run the environment and include dataset repo-id and repo-root (They will get created if not already exists)
 
     ```bash
