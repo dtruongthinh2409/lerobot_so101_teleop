@@ -1,0 +1,17 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+## 2025-10-06 / 1
+
+### Added
+- CHANGELOG
+
+### Changed
+- Recording is now saved as video to reduce storage size and for compatibilty
+- Camera is created dynamically and using a lens distortion model and parameters that are more simlar to the 2MP Camera that is shipped with the robot
+
+
+### Dependencies
+- lerobot[feetech]==0.3.3
+- ffmpeg=7.1.1

@@ -28,6 +28,10 @@ Sample Environment for the LeRobot SO-101 Robot in Isaac Lab to collect demonstr
     ```
     pip install 'lerobot[feetech]==0.3.3'
     ```
+    And ffmpeg
+    ```bash
+    conda install ffmpeg=7.1.1 -c conda-forge
+    ```
 - Make sure your Lerobot _Leader_ arm has been [calibrated](https://huggingface.co/docs/lerobot/en/so101#calibrate).
 
 - Clone this repository separately from the Isaac Lab installation (i.e. outside the `IsaacLab` directory):
@@ -66,7 +70,7 @@ _Currently only local recording without pushing to HuggingFace hub_
 
     ```bash
     python scripts/lerobot_agent.py --task Lerobot-So101-Teleop-v0 \
-    --repo_id lerobot_so101_teleop \
+    --repo_id lerobot/so101_teleop \
     --repo_root $(pwd)/datasets/lerobot_so101_teleop \
     --task_name "Pick up the blue ring and put it on the pole"
     ```
@@ -79,7 +83,7 @@ _Currently only local recording without pushing to HuggingFace hub_
 - To playback dataset episodes, use lerobot rerun visualizer
     ```bash
     python -m lerobot.scripts.visualize_dataset \
-    --repo-id lerobot_so101_teleop \
+    --repo-id lerobot/so101_teleop \
     --root $(pwd)/datasets/lerobot_so101_teleop --episode-index 0
     ```
 

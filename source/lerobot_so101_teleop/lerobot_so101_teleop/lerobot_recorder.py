@@ -45,7 +45,7 @@ class LeRobotRecorder:
                 ],
             },
             "observation.camera.gripper": {
-                "dtype": "image",
+                "dtype": "video",
                 "shape": (self.rgb_height, self.rgb_width, 3),
                 "names": ["height", "width", "channels"],
             },
@@ -186,6 +186,9 @@ class LeRobotRecorder:
                 )
 
             self.dataset.save_episode()
+            # encode the episode videos
+            # print(f"[INFO]: Encoding episode to video...")
+            # self.dataset.encode_episode_videos(self.dataset.num_episodes - 1)
 
             self.action_buffers = []
             self.observation_buffer_tensor = None
