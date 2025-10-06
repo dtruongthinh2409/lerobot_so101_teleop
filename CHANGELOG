@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 - CHANGELOG
+- Method to upload dataset to HuggingFace Hub
 
 ### Changed
 - Recording is now saved as video to reduce storage size and for compatibilty

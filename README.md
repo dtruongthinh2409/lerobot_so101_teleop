@@ -70,8 +70,8 @@ _Currently only local recording without pushing to HuggingFace hub_
 
     ```bash
     python scripts/lerobot_agent.py --task Lerobot-So101-Teleop-v0 \
-    --repo_id lerobot/so101_teleop \
-    --repo_root $(pwd)/datasets/lerobot_so101_teleop \
+    --repo_id hf-repo-id/so101_teleop \
+    --repo_root $(pwd)/datasets/so101_teleop \
     --task_name "Pick up the blue ring and put it on the pole"
     ```
 - Click `S` to start/stop the recording. Reset the environment `R` will also stop the recording
@@ -83,8 +83,18 @@ _Currently only local recording without pushing to HuggingFace hub_
 - To playback dataset episodes, use lerobot rerun visualizer
     ```bash
     python -m lerobot.scripts.visualize_dataset \
-    --repo-id lerobot/so101_teleop \
-    --root $(pwd)/datasets/lerobot_so101_teleop --episode-index 0
+    --repo-id hf-repo-id/so101_teleop \
+    --root $(pwd)/datasets/so101_teleop --episode-index 0
+    ```
+
+- To push your dataset to HuggingFace Hub (Optional)
+    ```bash
+    python scripts/lerobot_utils.py \
+    --push \
+    --repo-id liorbenhorin-nv/so101_teleop \
+    --root $(pwd)/datasets/so101_teleop \
+    --tags robotics teleop rock-a-stack \ # seperate by spaces
+    --private # or dont specify to push public
     ```
 
 ## Contributors

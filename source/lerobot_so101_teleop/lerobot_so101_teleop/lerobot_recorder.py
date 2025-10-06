@@ -186,9 +186,6 @@ class LeRobotRecorder:
                 )
 
             self.dataset.save_episode()
-            # encode the episode videos
-            # print(f"[INFO]: Encoding episode to video...")
-            # self.dataset.encode_episode_videos(self.dataset.num_episodes - 1)
 
             self.action_buffers = []
             self.observation_buffer_tensor = None
@@ -199,10 +196,3 @@ class LeRobotRecorder:
 
             print(f"[INFO]: Episode saved.")
 
-
-# if __name__ == "__main__":
-#     dataset = LeRobotDataset(
-#                 "/lbenhorin/lerobot_so101_teleop",
-#                 root="/home/lbenhorin/workspaces/github-isaac/lerobot_so101_teleop/datasets/recording_so101_teleop",
-#             )
-#     print(dataset)

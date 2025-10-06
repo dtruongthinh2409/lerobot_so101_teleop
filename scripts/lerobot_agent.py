@@ -13,7 +13,7 @@ import time
 from isaaclab.app import AppLauncher
 
 # add argparse arguments
-parser = argparse.ArgumentParser(description="Zero agent for Isaac Lab environments.")
+parser = argparse.ArgumentParser(description="Isaac Lab SO-101 Teleop agent.")
 parser.add_argument(
     "--disable_fabric",
     action="store_true",
