@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 import math
-from pty import spawn
+import torch
 
 import isaaclab.sim as sim_utils
 
@@ -41,11 +41,11 @@ class LerobotSo101TeleopSceneCfg(InteractiveSceneCfg):
         ),
     )
 
-    # Position values are grabbed from the USDA file, maybe there is a cleaner way to do this
+    # Position values are grabbed from the USDA file just for initialization
     base_plate = RigidObjectCfg(
         prim_path="{ENV_REGEX_NS}/Environment/rock_a_stack/Base",
         init_state=RigidObjectCfg.InitialStateCfg(
-            pos=(0.263018, -0.0750343, 0.0427306),
+            pos=(0.2, 0, 0.04),
             rot=(0.98098075, 0.0, 0.0, 0.19410504),
         ),
     )
@@ -91,22 +91,17 @@ class LerobotSo101TeleopSceneCfg(InteractiveSceneCfg):
     )
 
     def __post_init__(self) -> None:
-        rings = [
-            ("Ring01", (0.2778369, 0.0842460, 0.1237873)),
-            ("Ring02", (0.2712965, 0.01669392, 0.0968627)),
-            ("Ring03", (0.256586, 0.1236745, 0.0997186)),
-            ("Ring04", (0.297391, 0.1040611, 0.0650642)),
-            ("Ring05", (0.1968696, 0.1239567, 0.0698426)),
-        ]
-        for ring in rings:
+        # rings
+        for idx in range(1, 6):
             ring_cfg = RigidObjectCfg(
-                prim_path="{ENV_REGEX_NS}/Environment/rock_a_stack/" + ring[0],
+                prim_path="{ENV_REGEX_NS}/Environment/rock_a_stack/" + f"Ring{idx:02d}",
                 init_state=RigidObjectCfg.InitialStateCfg(
-                    pos=ring[1],
+                    pos=(0.2, 0, 0.03),  # intial pose to not conflict with the robot
                     rot=(1.0, 0.0, 0.0, 0.0),
                 ),
             )
-            setattr(self, ring[0], ring_cfg)
+            setattr(self, f"Ring{idx:02d}", ring_cfg)
+            print(f"Ring{idx:02d}")
 
 
 ##
@@ -193,7 +188,16 @@ class EventCfg:
     reset_physics_material_props = EventTerm(
         func=mdp.randomize_physics_material,
         mode="reset",
-        params={},
+        params={
+            "asset_names": [
+                "Ring01",
+                "Ring02",
+                "Ring03",
+                "Ring04",
+                "Ring05",
+                "base_plate",
+            ]
+        },
     )
 
     # Reset physics objects to their initial positions
@@ -202,12 +206,16 @@ class EventCfg:
         mode="reset",
         params={
             "pose_range": {
-                "x": (-0.05, 0.05),
-                "y": (-0.05, 0.05),
-                "z": (0, 0),
+                "x": (0.15 - 0.2, 0.3 - 0.2),
+                # offset by -2 to not conflict with the robot
+                "y": (0.0, -0.15),
+                # only scatter on right side of the robot
+                "z": (0.04, 0.04),
+                # no need to scatter on z
                 "roll": (0, 0),
                 "pitch": (0, 0),
                 "yaw": (-0.5, 0.5),
+                # randomize yaw
             },
             "velocity_range": {},
             "asset_cfg": SceneEntityCfg("base_plate"),
@@ -223,29 +231,19 @@ class EventCfg:
         },
     )
 
-    def __post_init__(self) -> None:
-        # Handle rings transform and physics material
-        for ring in ["Ring01", "Ring02", "Ring03", "Ring04", "Ring05"]:
-
-            reset_ring_transform = EventTerm(
-                func=mdp.reset_root_state_uniform,
-                mode="reset",
-                params={
-                    "pose_range": {"x": (-0.05, 0.05), "y": (-0.05, 0.05), "z": (0, 0)},
-                    "velocity_range": {},
-                    "asset_cfg": SceneEntityCfg(ring),
-                },
-            )
-            setattr(self, f"reset_{ring}_transform", reset_ring_transform)
-
-            reset_ring_physics_material = EventTerm(
-                func=mdp.apply_physics_material,
-                mode="reset",
-                params={
-                    "asset_cfg": SceneEntityCfg(ring),
-                },
-            )
-            setattr(self, f"reset_{ring}_phyiscs_material", reset_ring_physics_material)
+    reset_ring_transform = EventTerm(
+        func=mdp.reset_rings_transform_state_uniform,
+        mode="reset",
+        params={
+            "asset_names": ["Ring01", "Ring02", "Ring03", "Ring04", "Ring05"],
+            "x_y_pose_range":{
+            "x": (-0.1, 0.1),
+            # offset from the initial position to not conflict with the robot
+            "y": (0.25, 0.1),
+            # only scatter on left side of the robot
+        }
+        },
+    )
 
 
 @configclass
