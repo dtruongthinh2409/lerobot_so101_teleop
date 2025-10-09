@@ -6,7 +6,9 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 - scripts/list_envs.py error `ModuleNotFoundError: No module named 'omni.appwindow'`
-- sim crash when following the quickstart without specifing `repo_id` and `repo_root`
+- sim crash when following the quickstart without specifying `repo_id` and `repo_root`
+- gracefully exit if dataset folder exists but is not initialized correctly
+- spelling
 
 ## 2025-10-08 / 1
 
@@ -20,8 +22,8 @@ All notable changes to this project will be documented in this file.
 - Method to upload dataset to HuggingFace Hub
 
 ### Changed
-- Recording is now saved as video to reduce storage size and for compatibilty
-- Camera is created dynamically and using a lens distortion model and parameters that are more simlar to the 2MP Camera that is shipped with the robot
+- Recording is now saved as video to reduce storage size and for compatibility
+- Camera is created dynamically and using a lens distortion model and parameters that are more similar to the 2MP Camera that is shipped with the robot
 
 
 ### Dependencies

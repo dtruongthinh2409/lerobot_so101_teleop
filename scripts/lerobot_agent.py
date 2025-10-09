@@ -111,7 +111,12 @@ def main():
             rgb_height=env.scene.cfg.gripper_cam.height,
             rgb_width=env.scene.cfg.gripper_cam.width,
         )
-        recorder.init_dataset() 
+        try:
+            recorder.init_dataset() 
+        except ValueError:
+            print(f"[ERROR]: Failed to initialize dataset. folder already exists")
+            env.close()
+            simulation_app.close()
 
     while simulation_app.is_running():
         # run everything in inference mode

@@ -14,7 +14,7 @@
 
 [example.webm](https://github.com/user-attachments/assets/f66d9502-2cda-4ac9-b0ff-f750d6b19e2d)
 
-Sample Environment for the LeRobot SO-101 Robot in Isaac Lab to collect demonstrations in a simulation. This can be utilised to later procedurally scale up datasets using various methods of domain randomization and style transfer techniques ✨ 🤖
+Sample Environment for the LeRobot SO-101 Robot in Isaac Lab to collect demonstrations in a simulation. This can be utilized to later procedurally scale up datasets using various methods of domain randomization and style transfer techniques ✨ 🤖
 
 
 
@@ -43,7 +43,7 @@ Sample Environment for the LeRobot SO-101 Robot in Isaac Lab to collect demonstr
 - Using a python interpreter that has Isaac Lab installed, install the library in editable mode using:
 
     ```bash
-    # Make sure your isaac lab + lerbot conda env is activated
+    # Make sure your isaac lab + lerobot conda env is activated
     python -m pip install -e source/lerobot_so101_teleop
     ```
 
@@ -91,7 +91,7 @@ Sample Environment for the LeRobot SO-101 Robot in Isaac Lab to collect demonstr
     --push \
     --repo-id hf-repo-id/so101_teleop \
     --root $(pwd)/datasets/so101_teleop \
-    --tags robotics teleop rock-a-stack \ # seperate by spaces
+    --tags robotics teleop rock-a-stack \ # separate by spaces
     --private # or dont specify to push public
     ```
 
