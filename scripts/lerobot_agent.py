@@ -96,16 +96,22 @@ def main():
     camera = env.scene["gripper_cam"]
 
     # Recording dataset
-    recorder = LeRobotRecorder(
-        task_name=args_cli.task_name,
-        repo_id=args_cli.repo_id,
-        dataset_root=args_cli.repo_root,
-        fps=30,
-        device=env.unwrapped.device,
-        rgb_height=env.scene.cfg.gripper_cam.height,
-        rgb_width=env.scene.cfg.gripper_cam.width,
-    )
-    recorder.init_dataset() 
+    if all([args_cli.repo_id, args_cli.repo_root, args_cli.task_name]):
+        recording_mode = True
+    else:
+        recording_mode = False
+
+    if recording_mode:
+        recorder = LeRobotRecorder(
+            task_name=args_cli.task_name,
+            repo_id=args_cli.repo_id,
+            dataset_root=args_cli.repo_root,
+            fps=30,
+            device=env.unwrapped.device,
+            rgb_height=env.scene.cfg.gripper_cam.height,
+            rgb_width=env.scene.cfg.gripper_cam.width,
+        )
+        recorder.init_dataset() 
 
     while simulation_app.is_running():
         # run everything in inference mode
@@ -123,7 +129,7 @@ def main():
                 env.reset()
                 continue
 
-            if keyboard_control.recording:
+            if recording_mode and keyboard_control.recording:
                 recorder.push_frame_to_buffer(
                     real_action, 
                     obs["policy"][0], 

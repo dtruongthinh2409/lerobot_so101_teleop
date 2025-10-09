@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## 2025-10-09 / 1
+
+### Fixed
+- scripts/list_envs.py error `ModuleNotFoundError: No module named 'omni.appwindow'`
+- sim crash when following the quickstart without specifing `repo_id` and `repo_root`
+
 ## 2025-10-08 / 1
 
 ### Changed
