@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## 2025-10-13 / 1
+
+### Fixed
+- initiating camera using `env.unwrapped`
+
 ## 2025-10-09 / 1
 
 ### Fixed

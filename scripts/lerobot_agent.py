@@ -93,7 +93,7 @@ def main():
     # simulate environment
 
     # camera
-    camera = env.scene["gripper_cam"]
+    camera = env.unwrapped.scene["gripper_cam"]
 
     # Recording dataset
     if all([args_cli.repo_id, args_cli.repo_root, args_cli.task_name]):
