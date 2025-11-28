@@ -7,7 +7,8 @@ from carb.eventdispatcher import get_eventdispatcher, Event
 class KeyboardControl:
 
     STOP_RECORDING_EVENT: str = "lerobot_so101_teleop.stop_recording"
-    
+    CANCEL_RECORDING_EVENT: str = "lerobot_so101_teleop.cancel_recording"
+
     def __init__(self):
         self.reset_world = False
         self.recording = False
@@ -42,7 +43,14 @@ class KeyboardControl:
                 print(f"[INFO]: Started recording!")
                 return True
 
+            if event.input.name == "C":
+                if self.recording:
+                    self.cancel_recording()
+                    return True
+
         return False
+
+
 
     def cleanup(self):
         """Cleanup the keyboard interface"""
@@ -62,8 +70,12 @@ class KeyboardControl:
                 self.STOP_RECORDING_EVENT, 
                 payload={}
                 )
+    def cancel_recording(self):
+        if self.recording:
+            print(f"[INFO]: Cancelled recording.")
+            self.recording = False
 
-            # if hasattr(self, "recorder"):
-                # self.recorder.save_episode()
-                
-              
+            omni.kit.app.queue_event(
+                self.CANCEL_RECORDING_EVENT, 
+                payload={}
+                )

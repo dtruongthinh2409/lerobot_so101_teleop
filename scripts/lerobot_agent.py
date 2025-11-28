@@ -25,8 +25,12 @@ parser.add_argument(
 )
 parser.add_argument("--task", type=str, default=None, help="Name of the task.")
 
-parser.add_argument("--repo_id", type=str, default=None, help="Repository ID to store the dataset.")
-parser.add_argument("--repo_root", type=str, default=None, help="Repository root to store the dataset.")
+parser.add_argument(
+    "--repo_id", type=str, default=None, help="Repository ID to store the dataset."
+)
+parser.add_argument(
+    "--repo_root", type=str, default=None, help="Repository root to store the dataset."
+)
 parser.add_argument("--task_name", type=str, default=None, help="Name of the task.")
 
 # append AppLauncher cli args
@@ -46,7 +50,6 @@ simulation_app = app_launcher.app
 
 import gymnasium as gym
 import torch
-import os
 import time
 
 
@@ -58,16 +61,10 @@ from lerobot_so101_teleop.keyboard import KeyboardControl
 from lerobot_so101_teleop.lerobot_interface import LeRobotSO101Interface
 from lerobot_so101_teleop.lerobot_recorder import LeRobotRecorder
 
-import omni.replicator.core as rep
-from isaaclab.utils import convert_dict_to_backend
-
 
 def main():
 
     keyboard_control = KeyboardControl()
-
-    lerobot_cfg = {"port": "/dev/ttyACM0", "id": "leader_arm_1"}
-    lerobot_interface = LeRobotSO101Interface(cfg=lerobot_cfg)
 
     # parse configuration
     env_cfg = parse_env_cfg(
@@ -87,13 +84,34 @@ def main():
     # reset environment
     env.reset()
 
+    # cameras
+    cameras = {}
+    for obj in env.unwrapped.scene.keys():
+        if obj.startswith("camera_"):
+            camera_cfg = getattr(env.unwrapped.scene.cfg, obj)
+            cameras[obj.replace("camera_", "")] = {
+                "height": camera_cfg.height,
+                "width": camera_cfg.width,
+            }
+            print(f"[INFO]: Found Camera: {obj.replace('camera_', '')}")
+    if len(cameras) == 0:
+        print(f"[Info]: No cameras found - videos will not be recorded")
+
+    robot_iface = LeRobotSO101Interface(
+        device=env.unwrapped.device,
+        port="/dev/ttyACM0",
+        id="leader_arm_1",
+        cameras=cameras,
+        fps=30,
+        kind="leader",
+    )
+    robot_iface.init_device()
+    robot_iface.connect()
+
     # Allocate action tensor
     actions = torch.zeros(env.action_space.shape, device=env.unwrapped.device)
 
     # simulate environment
-
-    # camera
-    camera = env.unwrapped.scene["gripper_cam"]
 
     # Recording dataset
     if all([args_cli.repo_id, args_cli.repo_root, args_cli.task_name]):
@@ -108,11 +126,10 @@ def main():
             dataset_root=args_cli.repo_root,
             fps=30,
             device=env.unwrapped.device,
-            rgb_height=env.scene.cfg.gripper_cam.height,
-            rgb_width=env.scene.cfg.gripper_cam.width,
+            cameras=cameras,
         )
         try:
-            recorder.init_dataset() 
+            recorder.init_dataset()
         except ValueError:
             print(f"[ERROR]: Failed to initialize dataset. folder already exists")
             env.close()
@@ -121,12 +138,12 @@ def main():
     while simulation_app.is_running():
         # run everything in inference mode
         with torch.inference_mode():
-            real_action = lerobot_interface.teleop_dev.get_action()
-            actions[:] = lerobot_interface.get_mapped_actions_vectorized(
+            real_action = robot_iface.robot.get_action()
+            real_action, mapped_action = robot_iface.real_to_sim_obs_processor(
                 real_action
-            ).to(env.unwrapped.device)
+            )
+            actions[:] = mapped_action
 
-            # apply actions
             obs, _, _, _, _ = env.step(actions)
 
             if keyboard_control.reset_world:
@@ -135,12 +152,12 @@ def main():
                 continue
 
             if recording_mode and keyboard_control.recording:
-                recorder.push_frame_to_buffer(
-                    real_action, 
+                real_obs, visual_buffers = robot_iface.sim_to_real_dataset_processor(
                     obs["policy"][0], 
-                    camera.data.output["rgb"][0]
+                    obs["visual"]
                 )
-   
+                recorder.push_frame_to_buffer(real_action, real_obs, visual_buffers)
+
     env.close()
 
 

@@ -12,7 +12,8 @@ from .tasks import *
 from .keyboard import *
 from .lerobot_interface import *
 from .lerobot_recorder import *
-
+from .assets import *
+from .mdp import *
 
 
 # Register UI extensions.

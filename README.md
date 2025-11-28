@@ -1,8 +1,8 @@
 # Lerobot SO-101 Teleop Isaac Lab environment
 
 
-[![IsaacSim](https://img.shields.io/badge/IsaacSim-5.0.0-silver.svg)](https://docs.isaacsim.omniverse.nvidia.com/latest/index.html)
-[![IsaacLab](https://img.shields.io/badge/IsaacLab-2.3-silver)](https://isaac-sim.github.io/IsaacLab/)
+[![IsaacSim](https://img.shields.io/badge/IsaacSim-5.1.0-silver.svg)](https://docs.isaacsim.omniverse.nvidia.com/latest/index.html)
+[![IsaacLab](https://img.shields.io/badge/IsaacLab-2.3.0-silver)](https://isaac-sim.github.io/IsaacLab/)
 [![Python](https://img.shields.io/badge/python-3.11-blue.svg)](https://docs.python.org/3/whatsnew/3.11.html)
 
 
@@ -21,44 +21,57 @@ Sample Environment for the LeRobot SO-101 Robot in Isaac Lab to collect demonstr
 
 ## Installation
 
-- Install Isaac Lab by following the [installation guide](https://isaac-sim.github.io/IsaacLab/main/source/setup/installation/index.html).
- Use Conda to be synced with the Lerobot installation guide.
+- Create a Conda environment
+    ```bash
+    conda create -y -n lerobot-isaac-lab python=3.11
+    ```
 
-- In your isaac lab conda environment, Install Lerobot
-    ```
-    pip install 'lerobot[feetech]==0.3.3'
-    ```
-    And ffmpeg
+- In your the new environment, Install the following:
+
+    
     ```bash
     conda install ffmpeg=7.1.1 -c conda-forge
+
+    pip install uv
+
+    # install Isaac Sim
+    uv pip install "isaacsim[all,extscache]==5.1.0" --extra-index-url https://pypi.nvidia.com
+    # run isaac sim and accept the EULA
+    isaacsim
+  
+    # Install Isaac Lab
+    git clone https://github.com/isaac-sim/IsaacLab.git
+    cd IsaacLab
+    git checkout v2.3.0
+    ./isaaclab.sh -i
+    cd ..
+
+    # Install this repo!
+    git clone https://github.com/liorbenhorin/lerobot_so101_teleop.git
+    cd lerobot_so101_teleop
+    git lfs fetch # assets
+    uv pip install -e source/lerobot_so101_teleop
+
+    # Fix numpy dependency
+    uv pip install numpy==1.26.0 lxml==4.9.4 packaging==23.2
     ```
+
 - Make sure your Lerobot _Leader_ arm has been [calibrated](https://huggingface.co/docs/lerobot/en/so101#calibrate).
 
-- Clone this repository separately from the Isaac Lab installation (i.e. outside the `IsaacLab` directory):
-    ```bash
-    git clone https://gitlab-master.nvidia.com/lbenhorin/lerobot_so101_teleop.git
-    git lfs pull # assets
-    ```
-
-- Using a python interpreter that has Isaac Lab installed, install the library in editable mode using:
-
-    ```bash
-    # Make sure your isaac lab + lerobot conda env is activated
-    python -m pip install -e source/lerobot_so101_teleop
-    ```
+- Edit `scripts/lerobot_agent.py` by changing `lerobot_cfg` to match your port and id of your setup. (You have this information from the calibration step)
 
 - Verify that the extension is correctly installed by listing the available tasks:
 
     ```bash
     python scripts/list_envs.py
     ```
-    You should see a single environment called `Lerobot-So101-Teleop-v0`
-- Edit `scripts/lerobot_agent.py` by changing `lerobot_cfg` to match your port and id of your setup. (You have this information from the calibration step)
+    You should see a several environments named like `Lerobot-So101-Teleop-*`
+
 
 - Run the environment
 
     ```bash
-    python scripts/lerobot_agent.py --task Lerobot-So101-Teleop-v0
+    python scripts/lerobot_agent.py --task Lerobot-So101-Teleop-Rock-A-Stack
     ```
 - Get familiar with the teleop feeling
 
@@ -67,8 +80,8 @@ Sample Environment for the LeRobot SO-101 Robot in Isaac Lab to collect demonstr
 - Run the environment and include dataset repo-id and repo-root (They will get created if not already exists)
 
     ```bash
-    python scripts/lerobot_agent.py --task Lerobot-So101-Teleop-v0 \
-    --repo_id hf-repo-id/so101_teleop \
+    python scripts/lerobot_agent.py --task Lerobot-So101-Teleop-Rock-A-Stack \
+    --repo_id ${HF_USER}/so101_teleop \
     --repo_root $(pwd)/datasets/so101_teleop \
     --task_name "Pick up the blue ring and put it on the pole"
     ```
@@ -80,9 +93,10 @@ Sample Environment for the LeRobot SO-101 Robot in Isaac Lab to collect demonstr
 
 - To playback dataset episodes, use lerobot rerun visualizer
     ```bash
-    python -m lerobot.scripts.visualize_dataset \
-    --repo-id hf-repo-id/so101_teleop \
-    --root $(pwd)/datasets/so101_teleop --episode-index 0
+    lerobot-dataset-viz \
+    --repo-id ${HF_USER}/so101_teleop \
+    --root $(pwd)/datasets/so101_teleop \
+    --episode-index 0 # or other episode
     ```
 
 - To push your dataset to HuggingFace Hub (Optional)
@@ -95,6 +109,27 @@ Sample Environment for the LeRobot SO-101 Robot in Isaac Lab to collect demonstr
     --private # or dont specify to push public
     ```
 
+## Evaluate policy
+
+We assume you already trained a model based on the data collected (either in simulation or in real) and have a model ready to use
+
+```bash
+    python scripts/lerobot_eval.py \
+    --task Lerobot-So101-Teleop-Rock-A-Stack-Eval \
+    --policy_path ${HF_USER}/your_policy
+```
+
+If your policy has differnt camera names, you can also provide a mapping.
+The key is the simulated camera name and the value is the policy camera name.
+
+```bash
+    --rename_map '{"ego":"front", "external":"top"}'
+```
+
+## Creating new Tasks
+
+To learn how to add new tasks, [follow this guide](source/lerobot_so101_teleop/docs/tasks.md)
+
 ## Contributors
 
 - Thank you [LycheeAI](https://lycheeai-hub.com/) for making the SO101 arm available in USD format  💚 [https://github.com/MuammerBay/so-arm101-ros2-bridge/tree/main/IsaacSim_USD](https://github.com/MuammerBay/so-arm101-ros2-bridge/tree/main/IsaacSim_USD)
@@ -103,6 +138,6 @@ Sample Environment for the LeRobot SO-101 Robot in Isaac Lab to collect demonstr
 
 ## Limitations
 
-- Simulated teleoperation can be hard without VR headset.
+- Simulated teleoperation can be hard - but training makes perfect 🏅
 
 

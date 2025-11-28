@@ -1,3 +1,15 @@
 [build-system]
 requires = ["setuptools", "wheel", "toml"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "lerobot_so101_teleop"
+version = "0.1.0"
+description = "Lerobot SO-101 Teleop Isaac Lab environment"
+authors = [
+    { name="Lior Ben Horin", email="liorbenhorin@gmail.com" }
+]
+requires-python = ">=3.11"
+dependencies = [
+    "lerobot[feetech]==0.4.0",
+]

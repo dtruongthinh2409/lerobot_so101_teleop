@@ -2,6 +2,49 @@
 
 All notable changes to this project will be documented in this file.
 
+## 28-11-25 /1
+
+# Changed
+- Update install method for Isaac Sim, Lab and Lerobot
+
+## 31-10-25 /1
+
+# Added
+- Policy evaluation in the sim!
+
+# Changed
+- Refactor of lerobot_interface to handle sim to real logics inside
+
+
+## 2025-10-25 /1
+
+### Changed
+- Upgrade to support lerobot 0.4.0
+- Installation steps are now tricky due to confilicting dependencies
+
+## Added
+- List Isaac Sim, Lab and lerobot supported versions
+
+
+## 2025-10-24 /1
+
+### Added
+- Option to cancel recording 
+- Asynchronous episode saving
+
+## 2025-10-19 /1
+
+### Added
+- multi Camera support
+- option to set robot main color
+
+### Changed
+- significant refactor to simplify task creation and scalability
+- increased realisim by adding depth-of-field and better room asset
+
+### Removed
+- removed camera prim from the SO-ARM101-USD asset, it will be spawned during simulation
+
 ## 2025-10-13 / 1
 
 ### Fixed
