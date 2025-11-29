@@ -2,9 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## 29-11-25 /1
+
+## Changed
+- Update readme for new recording functions
+- Remove unused code
+- Combined the two example tasks into a single folder
+
+
 ## 28-11-25 /1
 
-# Changed
+## Changed
 - Update install method for Isaac Sim, Lab and Lerobot
 
 ## 31-10-25 /1

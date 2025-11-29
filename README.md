@@ -16,6 +16,7 @@
 
 Sample Environment for the LeRobot SO-101 Robot in Isaac Lab to collect demonstrations in a simulation. This can be utilized to later procedurally scale up datasets using various methods of domain randomization and style transfer techniques ✨ 🤖
 
+Episoded are recorded directly to Lerobot Dataset, and can quickly be uploaded to HuggingFace Hub 🚀
 
 
 
@@ -71,7 +72,7 @@ Sample Environment for the LeRobot SO-101 Robot in Isaac Lab to collect demonstr
 - Run the environment
 
     ```bash
-    python scripts/lerobot_agent.py --task Lerobot-So101-Teleop-Rock-A-Stack
+    python scripts/lerobot_agent.py --task Lerobot-So101-Teleop-Rock-A-Stack-Simple
     ```
 - Get familiar with the teleop feeling
 
@@ -80,16 +81,20 @@ Sample Environment for the LeRobot SO-101 Robot in Isaac Lab to collect demonstr
 - Run the environment and include dataset repo-id and repo-root (They will get created if not already exists)
 
     ```bash
-    python scripts/lerobot_agent.py --task Lerobot-So101-Teleop-Rock-A-Stack \
+    python scripts/lerobot_agent.py --task Lerobot-So101-Teleop-Rock-A-Stack-Hard \
     --repo_id ${HF_USER}/so101_teleop \
     --repo_root $(pwd)/datasets/so101_teleop \
-    --task_name "Pick up the blue ring and put it on the pole"
+    --task_name "Pick up the yellow ring and put it on the pole"
     ```
-- Click `S` to start/stop the recording. Reset the environment `R` will also stop the recording
 
-- After each episode there will be a short processing time, during that the simulator will be paused and a progress bar will show in the console.
+    - Click `S` to start/stop the recording. 
+    - Click `C` to cancel current recording (Very useful!).
+    - Reset the environment `R` will also stop the recording.
+    - Episodes are queued for processing, while you work.
+    - When you are done recodring, look for this massage in the console: `[INFO]: No more episodes in queue. Stopping processor thread...`
+    - Exit the simulation with `Ctrl+C`.
 
-- When done, exit the simulation with `Ctrl+C`
+## Playback & Upload
 
 - To playback dataset episodes, use lerobot rerun visualizer
     ```bash
@@ -115,7 +120,7 @@ We assume you already trained a model based on the data collected (either in sim
 
 ```bash
     python scripts/lerobot_eval.py \
-    --task Lerobot-So101-Teleop-Rock-A-Stack-Eval \
+    --task Lerobot-So101-Teleop-Rock-A-Stack-Hard-Eval \
     --policy_path ${HF_USER}/your_policy
 ```
 

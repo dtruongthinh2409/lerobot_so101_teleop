@@ -116,7 +116,7 @@ class RockAStackEventCfg(EventCfg):
 
 
 @configclass
-class RockAStackEnvCfg(BaseEnvCfg):
+class RockAStackSimpleEnvCfg(BaseEnvCfg):
     """Configuration for the rock-a-stack environment."""
 
     scene: LerobotSo101RockAStackSceneCfg = LerobotSo101RockAStackSceneCfg()
