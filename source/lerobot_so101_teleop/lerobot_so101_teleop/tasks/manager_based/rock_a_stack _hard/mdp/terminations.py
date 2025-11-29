@@ -1,48 +1,23 @@
-# Copyright (c) 2025
-# All rights reserved.
-#
-# SPDX-License-Identifier: BSD-3-Clause
-
-from __future__ import annotations
+# from __future__ import annotations
 
 import torch
-from typing import TYPE_CHECKING
 
+from isaaclab.envs import ManagerBasedRLEnv
 from isaaclab.assets import RigidObject
 from isaaclab.managers import SceneEntityCfg
 from isaaclab.managers.manager_base import ManagerTermBase
 from isaaclab.managers.manager_term_cfg import TerminationTermCfg
 
-if TYPE_CHECKING:
-    from isaaclab.envs import ManagerBasedRLEnv
 
 
 def ring_insertion_success(
     env: ManagerBasedRLEnv,
     xy_tolerance: float,
     z_threshold: float,
-    ring_cfg: SceneEntityCfg = SceneEntityCfg("Ring04"),
-    pole_cfg: SceneEntityCfg = SceneEntityCfg("base_plate"),
+    ring_cfg: SceneEntityCfg = SceneEntityCfg("yellow_ring"),
+    pole_cfg: SceneEntityCfg = SceneEntityCfg("rock_a_stack_base"),
 ) -> torch.Tensor:
-    """Terminate when ring has been successfully inserted onto the pole.
-    
-    NOTE: This logic is mirrored in rewards.py/ring_insertion_success() which gives
-    a reward for the same condition. Keep parameters in sync!
-    
-    This termination triggers when the ring is both:
-    1. Aligned with pole in x-y plane (within xy_tolerance)
-    2. At appropriate height (below z_threshold), indicating successful insertion
-    
-    Args:
-        env: The RL environment instance.
-        xy_tolerance: Maximum distance (in meters) in x-y plane to consider as aligned.
-        z_threshold: Maximum z-height (in meters) for the ring to be considered inserted.
-        ring_cfg: Configuration for the ring object (default: Ring04).
-        pole_cfg: Configuration for the pole object (default: base_plate).
-        
-    Returns:
-        A tensor of shape (num_envs,) with True for successful insertion, False otherwise.
-    """
+
     # Extract the ring and pole objects from the scene
     ring: RigidObject = env.scene[ring_cfg.name]
     pole: RigidObject = env.scene[pole_cfg.name]
@@ -99,8 +74,8 @@ class DynamicTimeout(ManagerTermBase):
         base_timeout: int = 250,
         extension: int = 150,
         tolerance: float = 0.02,
-        ring_cfg: SceneEntityCfg = SceneEntityCfg("Ring04"),
-        pole_cfg: SceneEntityCfg = SceneEntityCfg("base_plate"),
+        ring_cfg: SceneEntityCfg = SceneEntityCfg("yellow_ring"),
+        pole_cfg: SceneEntityCfg = SceneEntityCfg("rock_a_stack_base"),
     ) -> torch.Tensor:
         """Check if episode should timeout with dynamic extension.
         

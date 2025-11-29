@@ -6,7 +6,7 @@ from pxr import Gf, Sdf
 
 from isaacsim.core.utils.rotations import euler_angles_to_quat
 
-from isaaclab.sim import get_current_stage
+
 import isaaclab.sim as sim_utils
 
 from isaaclab.envs import ManagerBasedRLEnvCfg
@@ -23,14 +23,13 @@ from isaaclab.scene import InteractiveSceneCfg
 from isaaclab.utils import configclass
 from isaaclab.sensors import TiledCameraCfg
 
-from lerobot_so101_teleop.assets.so101 import SO101_CFG, SO101_REAL_CFG
-from lerobot_so101_teleop.assets.so101_optimized import SO101_OPTIMIZED_CFG
+from lerobot_so101_teleop.assets.so101 import SO101_CFG
+
 from lerobot_so101_teleop import assets
 from lerobot_so101_teleop.mdp import (
     randomize_light_exposure,
     randomize_static_asset_orientation,
     JointPositionActionCfg,
-    joint_pos_rel,
     joint_pos,
     reset_joints_by_offset,
     set_robot_visual_material_props,
@@ -70,7 +69,7 @@ class LerobotSo101BaseSceneCfg(InteractiveSceneCfg):
     )
 
     # robot
-    robot: ArticulationCfg = SO101_OPTIMIZED_CFG.replace(prim_path="{ENV_REGEX_NS}/Robot")
+    robot: ArticulationCfg = SO101_CFG.replace(prim_path="{ENV_REGEX_NS}/Robot")
 
     # Camera
     camera_ego = TiledCameraCfg(
@@ -164,8 +163,23 @@ class ObservationsCfg:
     @configclass
     class VisualCfg(ObsGroup):
         """Observations for policy group."""
-        camera_ego = ObsTerm(func=image, params={"sensor_cfg": SceneEntityCfg("camera_ego"), "data_type": "rgb", "normalize": False})
-        camera_external = ObsTerm(func=image, params={"sensor_cfg": SceneEntityCfg("camera_external"), "data_type": "rgb", "normalize": False})
+
+        camera_ego = ObsTerm(
+            func=image,
+            params={
+                "sensor_cfg": SceneEntityCfg("camera_ego"),
+                "data_type": "rgb",
+                "normalize": False,
+            },
+        )
+        camera_external = ObsTerm(
+            func=image,
+            params={
+                "sensor_cfg": SceneEntityCfg("camera_external"),
+                "data_type": "rgb",
+                "normalize": False,
+            },
+        )
 
         def __post_init__(self) -> None:
             self.enable_corruption = False
@@ -174,6 +188,7 @@ class ObservationsCfg:
     # observation groups
     policy: PolicyCfg = PolicyCfg()
     visual: VisualCfg = VisualCfg()
+
 
 @configclass
 class EventCfg:
@@ -240,7 +255,7 @@ class EventCfg:
     reset_set_robot_visual_material = EventTerm(
         func=set_robot_visual_material_props,
         mode="reset",
-        params={"diffuse_color": (0.12, 0.52, 0.47)}, # RGB - blueish color
+        params={"diffuse_color": (0.12, 0.52, 0.47)},  # RGB - blueish color
     )
 
 

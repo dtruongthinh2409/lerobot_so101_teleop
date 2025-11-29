@@ -1,17 +1,9 @@
 import os
-import math
 
 import isaaclab.sim as sim_utils
-
-from isaaclab.envs import ManagerBasedRLEnvCfg
 from isaaclab.managers import EventTermCfg as EventTerm
-from isaaclab.managers import ObservationGroupCfg as ObsGroup
-from isaaclab.managers import ObservationTermCfg as ObsTerm
 from isaaclab.managers import SceneEntityCfg
 from isaaclab.utils import configclass
-from isaaclab.assets.articulation import ArticulationCfg
-
-# import isaaclab.sim as sim_utils
 from isaaclab.assets import AssetBaseCfg, RigidObjectCfg
 from isaaclab.utils import configclass
 
@@ -23,7 +15,6 @@ from lerobot_so101_teleop.mdp import (
 )
 
 
-# from lerobot_so101_teleop.assets.so101 import SO101_EVAL_CFG
 from ..base.base_env_cfg import BaseEnvCfg, LerobotSo101BaseSceneCfg, EventCfg
 
 assets_path = os.path.dirname(os.path.abspath(assets.__file__))
@@ -143,14 +134,3 @@ class RockAStackEnvCfg(BaseEnvCfg):
         )
         self.physics_material_path = "/Looks/physicsMaterial"
         physics_material_cfg.func(self.physics_material_path, physics_material_cfg)
-
-
-@configclass
-class RockAStackEnvEvalCfg(RockAStackEnvCfg):
-
-    # robot: ArticulationCfg = SO101_EVAL_CFG.replace(prim_path="{ENV_REGEX_NS}/Robot")
-
-    def __post_init__(self) -> None:
-        super().__post_init__()
-
-        # self.scene.robot = self.robot
