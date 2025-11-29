@@ -26,7 +26,7 @@ class LerobotSo101RockAStackSceneCfg(LerobotSo101BaseSceneCfg):
     rock_a_stack = AssetBaseCfg(
         prim_path="{ENV_REGEX_NS}/RockAStack",
         spawn=sim_utils.UsdFileCfg(
-            usd_path=f"{assets_path}/usd/rock-a-stack.usd",
+            usd_path=f"{assets_path}/usd/rock-a-stack-simple.usd",
         ),
         # to deconflict with the robot during initialization
         init_state=AssetBaseCfg.InitialStateCfg(
